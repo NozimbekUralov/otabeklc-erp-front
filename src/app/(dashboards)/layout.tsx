@@ -12,7 +12,7 @@ export default function Layout({
       <SidebarProvider>
         <AppSidebar />
         <div className="w-full">
-          <header className="flex justify-between items-center py-2 px-4">
+          <header className="sticky top-2 rounded-md z-50 w-full flex justify-between items-center p-4">
             <SidebarTrigger size={'lg'} />
             <UserAvatar />
           </header>
