@@ -5,10 +5,11 @@ import { Home, UserPlus } from 'lucide-react';
 import { useEffect, useState } from "react";
 
 import type { INavItems } from "@/lib/types";
-import { Sidebar, SidebarContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator } from "@/components/ui/sidebar";
 import { useSupabase } from "@/contexts/supabase";
 import { Tables } from "@/db/types";
 import { Loading } from "@/components/ui/loading";
+import { Logo } from "@/components/logo";
 
 const adminNavItems: INavItems['navItems'] = [
   { href: '/admin', label: 'Dashboard', icon: <Home className="size-5" /> },
@@ -46,19 +47,27 @@ export function AppSidebar() {
   const navItems = profile.role === 'admin' ? adminNavItems : teacherNavItems
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" variant="floating">
+      <SidebarHeader>
+        <SidebarGroup>
+          <Logo className="text-2xl" />
+        </SidebarGroup>
+      </SidebarHeader>
+      <SidebarSeparator className="mx-0" />
       <SidebarContent>
-        <SidebarMenu className="px-2">
-          {navItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <Link href={item.href}>
-                <SidebarMenuButton>
-                  {item.icon} {item.label}
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <SidebarGroup>
+          <SidebarMenu>
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <Link href={item.href}>
+                  <SidebarMenuButton>
+                    {item.icon} {item.label}
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
