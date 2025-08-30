@@ -41,10 +41,6 @@ VALUES ('English'),
     ('Biology');
 
 ALTER TABLE public.subjects ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."subjects" FOR
-SELECT to authenticated USING (true);
-
 -- SUBJECTS END
 
 -- LEVELS BEGIN
@@ -62,10 +58,6 @@ VALUES ('1', 0.00),
     ('3', 0.00);
 
 ALTER TABLE public.levels ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."levels" FOR
-SELECT to authenticated USING (true);
-
 -- LEVELS END
 
 -- BRANCHES BEGIN
@@ -97,19 +89,15 @@ VALUES (
     );
 
 ALTER TABLE public.branches ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."branches" FOR
-SELECT TO authenticated USING (true);
-
 -- BRANCHES END
 
 -- PROFILES BEGIN
-CREATE TYPE user_role AS ENUM ('admin', 'teacher');
+CREATE TYPE user_role AS ENUM ('admin', 'teacher', 'student');
 
 CREATE TABLE IF NOT EXISTS public."profiles" (
     id uuid PRIMARY KEY NOT NULL REFERENCES auth.users (id) DEFAULT auth.uid (),
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    role user_role NOT NULL,
+    role user_role NOT NULL DEFAULT 'teacher',
     "firstName" VARCHAR(32) NOT NULL,
     "lastName" VARCHAR(32) NOT NULL,
     email VARCHAR(32) NOT NULL,
@@ -119,13 +107,6 @@ CREATE TABLE IF NOT EXISTS public."profiles" (
 );
 
 ALTER TABLE public."profiles" ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Allow all authenticated users to read own profiles" ON "public"."profiles" FOR ALL TO authenticated USING (
-    (
-        SELECT auth.uid ()
-    ) = id
-);
-
 -- PROFILES END
 
 -- STUDENTS BEGIN
@@ -141,10 +122,6 @@ CREATE TABLE IF NOT EXISTS public.students (
 );
 
 ALTER TABLE public.students ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."students" FOR
-SELECT TO authenticated USING (true);
-
 -- STUDENTS END
 
 -- GROUPS BEGIN
@@ -168,10 +145,6 @@ INSERT INTO
 VALUES ('Group 1', 1, 1, 1);
 
 ALTER TABLE public."groups" ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."groups" FOR
-SELECT TO authenticated USING (true);
-
 -- GROUPS END
 
 -- ROOMS BEGIN
@@ -185,10 +158,6 @@ CREATE TABLE IF NOT EXISTS public.rooms (
 INSERT INTO public.rooms (name, "branchId") VALUES ('Room 1', 1);
 
 ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."rooms" FOR
-SELECT TO authenticated USING (true);
-
 -- ROOMS END
 
 -- SCHEDULES BEGIN
@@ -235,10 +204,6 @@ VALUES (
     );
 
 ALTER TABLE public.schedules ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."schedules" FOR
-SELECT TO authenticated USING (true);
-
 -- SCHEDULES END
 
 -- LESSONS BEGIN
@@ -250,10 +215,6 @@ CREATE TABLE IF NOT EXISTS public.lessons (
 );
 
 ALTER TABLE public.lessons ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."lessons" FOR
-SELECT TO authenticated USING (true);
-
 -- LESSONS END
 
 -- INVOICES BEGIN
@@ -270,10 +231,6 @@ CREATE TABLE IF NOT EXISTS public.invoices (
 );
 
 ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Enable read access for all authenticated users" ON "public"."invoices" FOR
-SELECT TO authenticated USING (true);
-
 -- INVOICES END
 
 -- teacherSubjectMap BEGIN
@@ -284,7 +241,6 @@ CREATE TABLE IF NOT EXISTS public."teacherSubjectMap" (
 );
 
 ALTER TABLE public."teacherSubjectMap" ENABLE ROW LEVEL SECURITY;
-
 -- teacherSubjectMap END
 
 -- userGroupMap BEGIN
