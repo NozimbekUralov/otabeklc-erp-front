@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSupabase } from "./supabase";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import type { Tables } from "@/db/types";
 
 type UserContextType = {
