@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS public.students (
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     "firstName" VARCHAR(32) NOT NULL,
     "lastName" VARCHAR(32) NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
     photo TEXT NOT NULL,
     "userId" UUID REFERENCES auth.users (id),
     "branchId" INTEGER NOT NULL REFERENCES public.branches (id),

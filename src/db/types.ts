@@ -332,6 +332,7 @@ export type Database = {
           createdAt: string
           firstName: string
           id: string
+          isActive: boolean
           lastName: string
           photo: string
           userId: string | null
@@ -342,6 +343,7 @@ export type Database = {
           createdAt?: string
           firstName: string
           id?: string
+          isActive?: boolean
           lastName: string
           photo: string
           userId?: string | null
@@ -352,6 +354,7 @@ export type Database = {
           createdAt?: string
           firstName?: string
           id?: string
+          isActive?: boolean
           lastName?: string
           photo?: string
           userId?: string | null
