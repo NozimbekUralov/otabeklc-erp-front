@@ -7,28 +7,13 @@ import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSupabase } from "@/contexts/supabase";
-import { useEffect, useState } from "react";
-import { Tables } from "@/db/types";
+import { useUser } from "@/contexts/user-provider";
 import { Loading } from "./ui/loading";
 
 export function UserAvatar() {
   const router = useRouter()
   const supabase = useSupabase()
-  const [profile, setProfile] = useState<Tables<'profiles'> | null>(null)
-
-  useEffect(() => {
-    const getUerProfile = async () => {
-      const { data, error } = await supabase.auth.getClaims()
-      if (error || !data) throw error
-
-      const { error: profileError, data: user } = await supabase.from('profiles').select().eq('id', data.claims.sub).single()
-
-      if (profileError || !user) throw profileError
-
-      setProfile(user)
-    }
-    getUerProfile()
-  }, [supabase])
+  const { user: profile, isLoading } = useUser();
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -41,11 +26,13 @@ export function UserAvatar() {
     return words.map(name => name.charAt(0).toUpperCase()).join('')
   }
 
-  if (!profile) return (
+  if (isLoading) return (
     <Avatar>
       <Loading size="sm" />
     </Avatar>
   )
+
+  if (!profile) return null;
 
   const initials = getFirstLetters(profile.firstName + ' ' + profile.lastName)
 
