@@ -228,7 +228,7 @@ export type Database = {
           lastName: string
           phone: string
           photo: string
-          role: Database["public"]["Enums"]["user_role"]
+          role?: Database["public"]["Enums"]["user_role"]
         }
         Update: {
           balance?: number
@@ -459,7 +459,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      custom_access_token_hook: {
+        Args: { event: Json }
+        Returns: Json
+      }
     }
     Enums: {
       day_of_week:
@@ -470,7 +473,7 @@ export type Database = {
         | "friday"
         | "saturday"
         | "sunday"
-      user_role: "admin" | "teacher"
+      user_role: "admin" | "teacher" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -607,7 +610,7 @@ export const Constants = {
         "saturday",
         "sunday",
       ],
-      user_role: ["admin", "teacher"],
+      user_role: ["admin", "teacher", "student"],
     },
   },
 } as const
