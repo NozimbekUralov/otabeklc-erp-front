@@ -1,3 +1,5 @@
-export default function AdminDashboard() {
-  return <h1>Admin Dashboard</h1>;
+import { AdminDashboard } from "@/components/admin-dashboard";
+
+export default function AdminDashboardPage() {
+  return <AdminDashboard />
 }
