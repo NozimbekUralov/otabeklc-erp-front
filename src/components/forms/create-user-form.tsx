@@ -10,26 +10,22 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/select'
 import { useState, useEffect } from 'react'
-import { Database } from '@/db/types'
 
 export function CreateUserForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [phone, setPhone] = useState('')
-  type Role = Database['public']['Enums']['user_role']
-  const [role, setRole] = useState<Role>('teacher')
+  const [fullName, setFullName] = useState('')
+  const [role, setRole] = useState<'teacher' | 'student'>('teacher')
   const [branchId, setBranchId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -57,31 +53,50 @@ export function CreateUserForm({ className, ...props }: React.ComponentPropsWith
     setIsLoading(true)
     setError(null)
 
+    const [firstName, lastName] = fullName.split(' ')
+    if (!firstName || !lastName) {
+      return setError('Full name is required')
+    }
+
     if (!branchId) {
       return window.location.reload()
     }
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      })
+      if (role === 'teacher') {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              fullName
+            },
+          },
+        })
 
-      if (signUpError) throw signUpError
-      if (!data.user) throw new Error('User not created')
+        if (signUpError) throw signUpError
+        if (!data.user) throw new Error('User not created')
 
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        email,
-        firstName,
-        lastName,
-        phone,
-        branchId,
-        role,
-        photo: '/',
-      })
-
-      if (profileError) throw profileError
+        const { error: profileError } = await supabase.from('profiles').insert({
+          id: data.user.id,
+          firstName,
+          lastName,
+          email,
+          phone: '+998904716545',
+          photo: '/favicon.ico',
+          branchId,
+          role: 'teacher',
+        })
+        if (profileError) throw profileError
+      } else {
+        const { error: studentError } = await supabase.from('students').insert({
+          firstName,
+          lastName,
+          photo: '/favicon.ico',
+          branchId,
+        })
+        if (studentError) throw studentError
+      }
 
       setIsSuccess(true)
     } catch (error: unknown) {
@@ -137,48 +152,24 @@ export function CreateUserForm({ className, ...props }: React.ComponentPropsWith
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">Full Name</Label>
                 <Input
-                  id="firstName"
+                  id="fullName"
                   type="text"
                   required
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="role">Role</Label>
-                <Select
-                  required
-                  onValueChange={(e) => setRole(e as Role)}
-                  value={role}
-                >
-                  <SelectTrigger className='w-full'>
+                <Select value={role} onValueChange={(value) => setRole(value as 'teacher' | 'student')}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="teacher">Teacher</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="student">Student</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
