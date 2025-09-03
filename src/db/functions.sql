@@ -8,10 +8,11 @@ AS $$
 DECLARE
     claims    jsonb;
     user_role public.user_role;
+    branch_id INTEGER;
 BEGIN
     -- Look up the user's role from profiles using the JWT subject (sub) claim
-    SELECT role
-      INTO user_role
+    SELECT role, "branchId"
+      INTO user_role, branch_id
       FROM public.profiles
      WHERE id = (event->>'user_id')::uuid;
 
@@ -23,6 +24,10 @@ BEGIN
         claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role::text));
     ELSE
         claims := jsonb_set(claims, '{user_role}', to_jsonb('student'::text));
+    END IF;
+
+    IF branch_id IS NOT NULL THEN
+        claims := jsonb_set(claims, '{branch_id}', to_jsonb(branch_id::INTEGER));
     END IF;
 
     -- Put the updated claims back into the event payload
