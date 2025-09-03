@@ -152,11 +152,14 @@ ALTER TABLE public."groups" ENABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS public.rooms (
     id INTEGER generated always as identity PRIMARY KEY,
     name VARCHAR(32) NOT NULL UNIQUE,
+    capacity INTEGER NOT NULL DEFAULT 1 CHECK (capacity > 0),
     "branchId" INTEGER NOT NULL REFERENCES public.branches (id),
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-INSERT INTO public.rooms (name, "branchId") VALUES ('Room 1', 1);
+INSERT INTO
+    public.rooms (name, capacity, "branchId")
+VALUES ('Room 1', 20, 1);
 
 ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
 -- ROOMS END
@@ -246,8 +249,8 @@ ALTER TABLE public."teacherSubjectMap" ENABLE ROW LEVEL SECURITY;
 
 -- userGroupMap BEGIN
 CREATE TABLE IF NOT EXISTS public."userGroupMap" (
-    "teacherId" UUID REFERENCES public."profiles" (id),
-    "studentId" UUID REFERENCES public.students (id),
+    "teacherId" UUID REFERENCES public."profiles" (id) DEFAULT NULL,
+    "studentId" UUID REFERENCES public.students (id) DEFAULT NULL,
     "groupId" INTEGER NOT NULL REFERENCES public."groups" (id),
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (
